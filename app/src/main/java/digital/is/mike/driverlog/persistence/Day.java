@@ -3,13 +3,20 @@ package digital.is.mike.driverlog.persistence;
 import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
+import android.arch.persistence.room.TypeConverter;
+import android.support.annotation.NonNull;
 
+import com.prolificinteractive.materialcalendarview.CalendarDay;
+
+import java.time.LocalDate;
 import java.util.Date;
 
 @Entity
 public class Day {
+
     @PrimaryKey
-    private Date date;
+    @NonNull
+    private CalendarDay date;
 
     @ColumnInfo(name = "num_deliveries")
     private int numDeliveries;
@@ -35,9 +42,11 @@ public class Day {
     @ColumnInfo(name = "customer_fees")
     private int customerFees;
 
-    Day( Date date ) {
+    Day( CalendarDay date ) {
         this.date = date;
     }
+
+    public CalendarDay getDate () { return date; }
 
     public int getNumDeliveries () {
         return numDeliveries;
