@@ -14,7 +14,8 @@ import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
 
 import digital.is.mike.driverlog.R;
 
-public class MainActivity extends AppCompatActivity {
+public class
+MainActivity extends AppCompatActivity {
 
     private static final CalendarDay TODAY = CalendarDay.today();
 

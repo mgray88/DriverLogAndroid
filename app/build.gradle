@@ -18,6 +18,11 @@ android {
     }
     productFlavors {
     }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
 }
 
 dependencies {
@@ -29,5 +34,7 @@ dependencies {
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     implementation "android.arch.persistence.room:runtime:$room_version"
     annotationProcessor "android.arch.persistence.room:compiler:$room_version"
-    implementation 'com.github.prolificinteractive:material-calendarview:1.5.0'
+    //implementation 'com.github.prolificinteractive:material-calendarview:1.5.0'
+    implementation 'com.android.support:gridlayout-v7:27.1.1'
+    implementation project(":materialcalendarview")
 }
