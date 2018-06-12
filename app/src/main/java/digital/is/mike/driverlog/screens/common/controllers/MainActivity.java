@@ -8,6 +8,8 @@ import android.support.annotation.Nullable;
 
 import digital.is.mike.driverlog.R;
 import digital.is.mike.driverlog.screens.common.mvcviews.RootViewMvcImpl;
+import digital.is.mike.driverlog.screens.month.controllers.MonthFragment;
+import digital.is.mike.driverlog.screens.month.mvcviews.MonthViewMvcImpl;
 
 public class MainActivity extends Activity implements BaseFragment.AbstractFragmentCallback {
 
@@ -36,8 +38,8 @@ public class MainActivity extends Activity implements BaseFragment.AbstractFragm
 
         // show the default fragment if the application is not restored
         if (savedInstanceState == null) {
-            // TODO: put default class instantiaion here
-            //replaceFragment();
+            // TODO: put default class instantiation here
+            replaceFragment(MonthFragment.class, false, null);
         }
     }
 
