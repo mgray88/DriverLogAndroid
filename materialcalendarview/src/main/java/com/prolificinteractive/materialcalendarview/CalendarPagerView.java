@@ -1,7 +1,9 @@
 package com.prolificinteractive.materialcalendarview;
 
+import android.os.Build;
 import android.support.annotation.NonNull;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.accessibility.AccessibilityEvent;
@@ -27,6 +29,7 @@ abstract class CalendarPagerView extends ViewGroup implements View.OnClickListen
     protected static final int DAY_NAMES_ROW = 1;
     private static final Calendar tempWorkingCalendar = CalendarUtils.getInstance();
     private final ArrayList<WeekDayView> weekDayViews = new ArrayList<>();
+    private final ArrayList<WeekNumberView> weekNumberViews = new ArrayList<>();
     private final ArrayList<DecoratorResult> decoratorResults = new ArrayList<>();
     @ShowOtherDates
     protected int showOtherDates = SHOW_DEFAULTS;
@@ -35,27 +38,41 @@ abstract class CalendarPagerView extends ViewGroup implements View.OnClickListen
     private CalendarDay minDate = null;
     private CalendarDay maxDate = null;
     private int firstDayOfWeek;
+    protected boolean showWeekDays;
 
     private final Collection<DayView> dayViews = new ArrayList<>();
 
     public CalendarPagerView(@NonNull MaterialCalendarView view,
                              CalendarDay firstViewDay,
-                             int firstDayOfWeek) {
+                             int firstDayOfWeek,
+                             boolean showWeekDays) {
         super(view.getContext());
         this.mcv = view;
         this.firstViewDay = firstViewDay;
         this.firstDayOfWeek = firstDayOfWeek;
+        this.showWeekDays = showWeekDays;
 
         setClipChildren(false);
         setClipToPadding(false);
 
-        buildWeekDays(resetAndGetWorkingCalendar());
+        if (showWeekDays) {
+            buildWeekDays(resetAndGetWorkingCalendar());
+        }
         buildDayViews(dayViews, resetAndGetWorkingCalendar());
     }
 
     private void buildWeekDays(Calendar calendar) {
+        // TODO: Better way to avoid buildWeekDays for SINGLEDAY?
+        if (mcv.getCalendarMode() == CalendarMode.SINGLEDAY) return;
+        if (mcv.getShowWeekNumbers()) {
+            // Add empty view
+            addView(new View(getContext()), new LayoutParams());
+        }
         for (int i = 0; i < DEFAULT_DAYS_IN_WEEK; i++) {
             WeekDayView weekDayView = new WeekDayView(getContext(), CalendarUtils.getDayOfWeek(calendar));
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                weekDayView.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO);
+            }
             weekDayViews.add(weekDayView);
             addView(weekDayView);
             calendar.add(DATE, 1);
@@ -70,6 +87,14 @@ abstract class CalendarPagerView extends ViewGroup implements View.OnClickListen
         addView(dayView, new LayoutParams());
 
         calendar.add(DATE, 1);
+    }
+
+    protected void addWeekNumberView( Calendar calendar ) {
+        CalendarDay day = CalendarDay.from(calendar);
+        WeekNumberView weekNumberView = new WeekNumberView(getContext(), day);
+        weekNumberView.setOnClickListener(this);
+        weekNumberViews.add(weekNumberView);
+        addView(weekNumberView, new LayoutParams());
     }
 
     protected Calendar resetAndGetWorkingCalendar() {
@@ -89,6 +114,10 @@ abstract class CalendarPagerView extends ViewGroup implements View.OnClickListen
 
     protected int getFirstDayOfWeek() {
         return firstDayOfWeek;
+    }
+
+    protected boolean showWeekNumbers() {
+        return mcv.getShowWeekNumbers();
     }
 
     protected abstract void buildDayViews(Collection<DayView> dayViews, Calendar calendar);
@@ -112,6 +141,12 @@ abstract class CalendarPagerView extends ViewGroup implements View.OnClickListen
     public void setDateTextAppearance(int taId) {
         for (DayView dayView : dayViews) {
             dayView.setTextAppearance(getContext(), taId);
+        }
+    }
+
+    public void setWeekNumberTextAppearance(int taId) {
+        for (WeekNumberView weekNumberView : weekNumberViews) {
+            weekNumberView.setTextAppearance(getContext(), taId);
         }
     }
 
@@ -145,6 +180,12 @@ abstract class CalendarPagerView extends ViewGroup implements View.OnClickListen
         }
     }
 
+    public void setDayFormatterContentDescription(DayFormatter formatter) {
+        for (DayView dayView : dayViews) {
+            dayView.setDayFormatterContentDescription(formatter);
+        }
+    }
+
     public void setMinimumDate(CalendarDay minDate) {
         this.minDate = minDate;
         updateUi();
@@ -169,6 +210,11 @@ abstract class CalendarPagerView extends ViewGroup implements View.OnClickListen
             dayView.setupSelection(
                     showOtherDates, day.isInRange(minDate, maxDate), isDayEnabled(day));
         }
+        for (WeekNumberView view : weekNumberViews) {
+            CalendarDay day = view.getDate();
+            view.setupSelection(
+                    showOtherDates, day.isInRange(minDate, maxDate), isDayEnabled(day));
+        }
         postInvalidate();
     }
 
@@ -190,6 +236,9 @@ abstract class CalendarPagerView extends ViewGroup implements View.OnClickListen
         if (v instanceof DayView) {
             final DayView dayView = (DayView) v;
             mcv.onDateClicked(dayView);
+        } else if (v instanceof WeekNumberView) {
+            final WeekNumberView weekNumberView = (WeekNumberView) v;
+            mcv.onWeekNumberClicked(weekNumberView);
         }
     }
 
@@ -221,7 +270,7 @@ abstract class CalendarPagerView extends ViewGroup implements View.OnClickListen
         }
 
         //The spec width should be a correct multiple
-        final int measureTileWidth = specWidthSize / DEFAULT_DAYS_IN_WEEK;
+        final int measureTileWidth = specWidthSize / getCols();
         final int measureTileHeight = specHeightSize / getRows();
 
         //Just use the spec sizes
@@ -253,6 +302,12 @@ abstract class CalendarPagerView extends ViewGroup implements View.OnClickListen
     protected abstract int getRows();
 
     /**
+     * Return the number of columns to display per page.
+     * When in MCV.Weeks mode, shouldn't be any different than DEFAULT_DAYS_IN_WEEK
+     */
+    protected abstract int getCols();
+
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -274,8 +329,8 @@ abstract class CalendarPagerView extends ViewGroup implements View.OnClickListen
 
             childLeft += width;
 
-            //We should warp every so many children
-            if (i % DEFAULT_DAYS_IN_WEEK == (DEFAULT_DAYS_IN_WEEK - 1)) {
+            //We should wrap every so many children
+            if (i % getCols() == (getCols() - 1)) {
                 childLeft = parentLeft;
                 childTop += height;
             }

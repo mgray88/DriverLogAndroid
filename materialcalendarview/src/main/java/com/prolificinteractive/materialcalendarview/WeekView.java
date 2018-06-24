@@ -14,14 +14,16 @@ import java.util.Collection;
 @SuppressLint("ViewConstructor")
 public class WeekView extends CalendarPagerView {
 
-    public WeekView(@NonNull MaterialCalendarView view,
-                    CalendarDay firstViewDay,
-                    int firstDayOfWeek) {
-        super(view, firstViewDay, firstDayOfWeek);
+    public WeekView(@NonNull MaterialCalendarView view, CalendarDay firstViewDay,
+                    int firstDayOfWeek, boolean showWeekDays) {
+        super(view, firstViewDay, firstDayOfWeek, showWeekDays);
     }
 
     @Override
     protected void buildDayViews(Collection<DayView> dayViews, Calendar calendar) {
+        if (showWeekNumbers()) {
+            addWeekNumberView(calendar);
+        }
         for (int i = 0; i < DEFAULT_DAYS_IN_WEEK; i++) {
             addDayView(dayViews, calendar);
         }
@@ -34,6 +36,11 @@ public class WeekView extends CalendarPagerView {
 
     @Override
     protected int getRows() {
-        return DAY_NAMES_ROW + 1;
+        return showWeekDays ? DAY_NAMES_ROW + 1 : 1;
+    }
+
+    @Override
+    protected int getCols () {
+        return DEFAULT_DAYS_IN_WEEK + (showWeekNumbers() ? 1 : 0);
     }
 }

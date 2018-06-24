@@ -38,7 +38,6 @@ public class MainActivity extends Activity implements BaseFragment.AbstractFragm
 
         // show the default fragment if the application is not restored
         if (savedInstanceState == null) {
-            // TODO: put default class instantiation here
             replaceFragment(MonthFragment.class, false, null);
         }
     }

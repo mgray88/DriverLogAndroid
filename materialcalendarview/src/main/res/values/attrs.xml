@@ -6,6 +6,7 @@
         <attr name="mcv_dateTextAppearance" format="reference" />
         <attr name="mcv_weekDayTextAppearance" format="reference" />
         <attr name="mcv_headerTextAppearance" format="reference" />
+        <attr name="mcv_weekNumberTextAppearance" format="reference" />
 
         <attr name="mcv_arrowColor" format="color" />
         <attr name="mcv_leftArrowMask" format="reference" />
@@ -22,6 +23,7 @@
         </attr>
 
         <attr name="mcv_allowClickDaysOutsideCurrentMonth" format="boolean" />
+        <attr name="mcv_showWeekDays" format="boolean" />
 
         <attr name="mcv_weekDayLabels" format="reference" />
         <attr name="mcv_monthLabels" format="reference" />
@@ -58,6 +60,9 @@
             <enum name="vertical" value="0" />
             <enum name="horizontal" value="1" />
         </attr>
+
+        <attr name="mcv_showWeekNumbers" format="boolean" />
+
     </declare-styleable>
 
 </resources>

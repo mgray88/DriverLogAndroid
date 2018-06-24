@@ -80,4 +80,8 @@ public class CalendarUtils {
     public static int getDayOfWeek(Calendar calendar) {
         return calendar.get(DAY_OF_WEEK);
     }
+
+    public static int getWeekOfYear(Calendar calendar) {
+        return calendar.get(Calendar.WEEK_OF_YEAR);
+    }
 }

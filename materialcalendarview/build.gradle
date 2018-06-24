@@ -24,6 +24,7 @@ android {
 
 dependencies {
     implementation rootProject.ext.supportV4
+    implementation rootProject.ext.supportAppCompat
     implementation rootProject.ext.supportAnnotations
 
     rootProject.ext.testDep.each { testImplementation it }
@@ -42,7 +43,7 @@ android.libraryVariants.all { variant ->
         description "Generates Javadoc for $variant.name."
         source = variant.javaCompiler.source
         doFirst {
-            classpath = files(variant.javaCompiler.classpaxth.files, project.android.getBootClasspath())
+            classpath = files(variant.javaCompiler.classpath.files, project.android.getBootClasspath())
         }
         exclude '**/BuildConfig.java'
         exclude '**/R.java'
