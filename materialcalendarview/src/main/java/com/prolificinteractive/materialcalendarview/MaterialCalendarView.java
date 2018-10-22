@@ -1588,22 +1588,6 @@ public class MaterialCalendarView extends ViewGroup {
     }
 
     protected void onWeekNumberClicked(final WeekNumberView weekNumberView) {
-        final CalendarDay currentDate = getCurrentDate();
-        final CalendarDay selectedDate = weekNumberView.getDate();
-        final int currentMonth = currentDate.getMonth();
-        final int selectedMonth = selectedDate.getMonth();
-
-        // TODO: Logic to change months when week number selected outside of current month
-        /*if (calendarMode == CalendarMode.MONTHS
-                && allowClickDaysOutsideCurrentMonth
-                && currentMonth != selectedMonth) {
-            if (currentDate.isAfter(selectedDate)) {
-                goToPrevious();
-            } else if (currentDate.isBefore(selectedDate)) {
-                goToNext();
-            }
-        }*/
-
         dispatchOnWeekSelected(weekNumberView.getDate());
     }
 
@@ -2062,9 +2046,9 @@ public class MaterialCalendarView extends ViewGroup {
         }
 
         /**
-         * TODO: javadoc for setShowWeekNumbers
+         * @param showWeekNumbers true to show week numbers
          */
-        public StateBuilder setShowWeekNumbers(final boolean showWeekNumbers) {
+        public StateBuilder setShowWeekNumbers(boolean showWeekNumbers) {
             this.showWeekNumbers = showWeekNumbers;
             return this;
         }

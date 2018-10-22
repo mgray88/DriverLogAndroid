@@ -7,9 +7,11 @@ import android.support.annotation.NonNull;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.StyleSpan;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.prolificinteractive.materialcalendarview.CalendarDay;
 import com.prolificinteractive.materialcalendarview.CalendarMode;
@@ -18,6 +20,8 @@ import com.prolificinteractive.materialcalendarview.DayViewFacade;
 import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
 import com.prolificinteractive.materialcalendarview.OnDateSelectedListener;
 import com.prolificinteractive.materialcalendarview.OnWeekSelectedListener;
+
+import java.util.List;
 
 import digital.is.mike.driverlog.R;
 
@@ -65,6 +69,8 @@ public class MonthViewMvcImpl implements MonthViewMvc {
             @Override
             public void onWeekSelected ( @NonNull MaterialCalendarView widget, @NonNull CalendarDay date ) {
                 widget.selectRange(date, CalendarDay.from(date.getYear(), date.getMonth(), date.getDay()+6));
+                List<CalendarDay> dates = widget.getSelectedDates();
+                Log.i("Selected dates:", dates.get(0).toString() + " - " + dates.get(dates.size() - 1).toString());
             }
         });
     }

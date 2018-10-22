@@ -210,10 +210,12 @@ abstract class CalendarPagerView extends ViewGroup implements View.OnClickListen
             dayView.setupSelection(
                     showOtherDates, day.isInRange(minDate, maxDate), isDayEnabled(day));
         }
+        int r = 0;
         for (WeekNumberView view : weekNumberViews) {
             CalendarDay day = view.getDate();
             view.setupSelection(
-                    showOtherDates, day.isInRange(minDate, maxDate), isDayEnabled(day));
+                    showOtherDates, day.isInRange(minDate, maxDate),
+                    (r++ == 0 || isDayEnabled(day)));
         }
         postInvalidate();
     }
@@ -233,12 +235,13 @@ abstract class CalendarPagerView extends ViewGroup implements View.OnClickListen
 
     @Override
     public void onClick(View v) {
-        if (v instanceof DayView) {
-            final DayView dayView = (DayView) v;
-            mcv.onDateClicked(dayView);
-        } else if (v instanceof WeekNumberView) {
+        if (v instanceof WeekNumberView) {
             final WeekNumberView weekNumberView = (WeekNumberView) v;
             mcv.onWeekNumberClicked(weekNumberView);
+        }
+        else if (v instanceof DayView) {
+            final DayView dayView = (DayView) v;
+            mcv.onDateClicked(dayView);
         }
     }
 
